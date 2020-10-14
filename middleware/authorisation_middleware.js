@@ -1,19 +1,18 @@
 function authRedirect(req, res, next) {
-    // console.log("session",req.session)
-    // console.log("user",req.user)
-    if (req.session && req.session.user) {
+    // TODO what have I missed here?
+    if (req.user) {
         return res.redirect("/dashboard");
+    } else {
+        return next();
     }
-
-    return next();
 }
 
 function authorise(req, res, next) {
-    if (req.session.user) {
+    if (req.user) {
         return next();
+    } else {
+        return res.redirect("/");
     }
-
-    return res.redirect("/");
 }
 
 module.exports = {

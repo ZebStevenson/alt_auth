@@ -1,21 +1,27 @@
 const UserModel = require("../models/user");
+const passport = require('passport');
 
 function registerNew(req, res) {
     res.render("authentication/register");
 }
 
-async function registerCreate(req, res) {
+function registerCreate(req, res, next) {
+    const newUserHandler = (user) => {
+      	// Where did we get req.login from?
+        req.login(user, (err) => {
+            if(err){
+                next(err)
+            } else {
+                res.redirect("/dashboard")
+            }
+        })
+    }
+
+
     const { email, password } = req.body;
-    try{
-            const user = await UserModel.create({ email, password });
-            req.session.user = user;
-            res.redirect("/dashboard");
-    }
-    catch(err){
-        console.log(err)
-    }
 
-
+    UserModel.create({email, password})
+    .then(newUserHandler)
 }
 
 function logout(req, res) {
@@ -28,23 +34,13 @@ function loginNew(req, res) {
     res.render("authentication/login");
 }
 
-async function loginCreate(req, res) {
-    //code to go here
-    // res.json(req.body);
-    const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });
-    // console.log(user)
-    if (!user) {
-        return res.render("authentication/login", { error: "Invalid email & password" });
-    }
-
-    const valid = await user.verifyPassword(password);
-    if (!valid) {
-        return res.render("authentication/login", { error: "Invalid email & password" });
-    }
-
-    req.session.user = user;
-    res.redirect("/dashboard");
+function loginCreate(req, res, next) {
+    const loginFunc = passport.authenticate("local",
+    {
+        successRedirect: "/dashboard",
+        failureRedirect: "/user/login"
+    })
+    loginFunc(req, res, next)
 }
 
 module.exports = {

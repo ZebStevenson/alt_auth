@@ -5,7 +5,7 @@ function index(req, res) {
 }
 function dashboard(req, res) {
     // res.send("Welcome to your dashboard!");
-    const email = req.session.user.email;
+    const email = req.user.email;
     res.render("dashboard", { email });
 }
 

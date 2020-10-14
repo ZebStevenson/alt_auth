@@ -3,6 +3,8 @@ const expressSession = require('express-session')
 const MongoStore = require('connect-mongo')(expressSession);
 const mongoose = require('mongoose');
 const exphbs  = require('express-handlebars');
+const passport = require('passport');
+
 
 const postRouter = require('./routes/posts_routes');
 const pageRouter = require("./routes/pages_routes");
@@ -24,6 +26,10 @@ app.use(express.urlencoded({
 extended:true
 }));
 
+// Configure local strat for passport
+require('./middleware/passport')
+app.use(passport.initialize())
+app.use(passport.session())
 
 const dbConn = 'mongodb://localhost/blog_app_auth'
 // Set three properties to avoid deprecation warnings:
